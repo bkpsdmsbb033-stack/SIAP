@@ -14,37 +14,57 @@
     <style>
         :root { --primary: #2c3e50; --success: #27ae60; --bg: #f4f7f9; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; }
-        #report-area { width: 100%; max-width: 480px; background: white; display: flex; flex-direction: column; position: relative; }
+
+        /* Area yang akan dijadikan PDF */
+        #report-area { width: 100%; max-width: 480px; background: white; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+
         .header-kop { display: flex; align-items: center; padding: 18px; background: white; border-bottom: 3px solid #000; gap: 15px; }
         .logo-kab { width: 45px; height: 55px; object-fit: contain; }
         .opd-info b { font-size: 15px; color: #111; display: block; text-transform: uppercase; line-height: 1.2; }
         .opd-info span { font-size: 11px; color: #444; font-weight: bold; }
+
         #photo-container { position: relative; width: 100%; background: #000; line-height: 0; overflow: hidden; min-height: 300px; }
         video { width: 100%; display: block; transition: filter 0.2s; }
         .mirror { transform: scaleX(-1); }
+        
         canvas#overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; }
         #snapshot-canvas { display: none; width: 100%; }
-        .cam-controls { position: absolute; bottom: 15px; left: 10px; right: 10px; z-index: 10; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; }
+
+        .cam-controls {
+            position: absolute; bottom: 15px; left: 10px; right: 10px; z-index: 10;
+            display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.4);
+            padding: 10px; border-radius: 8px;
+        }
+
         .cam-row { display: flex; align-items: center; gap: 10px; color: white; font-size: 12px; }
         .cam-row input { flex: 1; accent-color: var(--success); }
-        #switch-btn { position: absolute; top: 10px; right: 10px; z-index: 10; background: var(--success); color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: bold; }
+
+        #switch-btn {
+            position: absolute; top: 10px; right: 10px; z-index: 10;
+            background: var(--success); color: white; border: none;
+            padding: 8px 12px; border-radius: 5px; cursor: pointer;
+            font-size: 11px; font-weight: bold;
+        }
+
         .data-footer { padding: 18px; background: white; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; border-top: 1px solid #eee; }
         .footer-section h4 { margin: 0 0 8px 0; font-size: 13px; color: var(--success); border-bottom: 1px solid #eee; padding-bottom: 4px; }
         .info-text { font-size: 10px; color: #333; line-height: 1.4; }
         #map { width: 100%; height: 100px; margin-top: 8px; border: 1px solid #ddd; border-radius: 4px; }
         .rekap-grid { display: grid; grid-template-columns: 1fr auto; gap: 4px; font-size: 11px; }
+
+        /* Area Input (Tidak masuk PDF) */
         .controls { width: 92%; max-width: 480px; margin: 20px 0; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); box-sizing: border-box; }
         .grid-input { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-        input[type="text"], input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn-main { background: var(--success); color: white; border: none; padding: 18px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .btn-main:disabled { background: #ccc; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        .btn-main { background: var(--success); color: white; border: none; padding: 18px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .btn-main:disabled { background: #ccc; cursor: not-allowed; }
     </style>
 </head>
 <body onload="startApp()">
 
     <div id="report-area">
         <div class="header-kop">
-            <img src="img/Kab-sbb.png" class="logo-kab" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/b/bc/Lambang_Kabupaten_Seram_Bagian_Barat.png'">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/bc/Lambang_Kabupaten_Seram_Bagian_Barat.png" class="logo-kab">
             <div class="opd-info">
                 <b id="opd-name-top">BKPSDM</b>
                 <span>PEMERINTAH KABUPATEN SERAM BAGIAN BARAT</span>
@@ -73,6 +93,7 @@
                 </div>
                 <div id="map"></div>
             </div>
+            
             <div class="footer-section">
                 <h4>REKAP KEHADIRAN</h4>
                 <div class="rekap-grid">
@@ -83,6 +104,7 @@
                     <span>Tugas:</span> <b id="out-tugas">0</b>
                     <span>Izin Belajar:</span> <b id="out-belajar">0</b>
                 </div>
+                <p style="font-size: 9px; margin-top: 15px; color: #888; font-style: italic;">* Data laporan otomatis tersinkronisasi.</p>
             </div>
         </div>
     </div>
@@ -90,11 +112,11 @@
     <div class="controls">
         <input type="text" id="input-opd" placeholder="Ketik Nama OPD..." oninput="syncText(this, 'opd-name-top')" style="margin-bottom:12px;">
         <div class="grid-input">
-            <input type="number" placeholder="Cuti" oninput="syncText(this, 'out-cuti')">
-            <input type="number" placeholder="Izin" oninput="syncText(this, 'out-izin')">
-            <input type="number" placeholder="Sakit" oninput="syncText(this, 'out-sakit')">
-            <input type="number" placeholder="Tugas" oninput="syncText(this, 'out-tugas')">
-            <input type="number" placeholder="Izin Belajar" oninput="syncText(this, 'out-belajar')" style="grid-column: span 2;">
+            <input type="number" id="in-cuti" placeholder="Jumlah Cuti" oninput="syncText(this, 'out-cuti')">
+            <input type="number" id="in-izin" placeholder="Jumlah Izin" oninput="syncText(this, 'out-izin')">
+            <input type="number" id="in-sakit" placeholder="Jumlah Sakit" oninput="syncText(this, 'out-sakit')">
+            <input type="number" id="in-tugas" placeholder="Jumlah Tugas" oninput="syncText(this, 'out-tugas')">
+            <input type="number" id="in-belajar" placeholder="Izin Belajar" oninput="syncText(this, 'out-belajar')" style="grid-column: span 2;">
         </div>
         <button class="btn-main" id="btn-save" onclick="generateFastPDF()" disabled>⌛ MENGUNCI LOKASI...</button>
     </div>
@@ -131,7 +153,7 @@
                     document.getElementById('wm-time').innerText = n.toLocaleTimeString('id-ID');
                     document.getElementById('wm-date').innerText = n.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
                 }, 1000);
-            } catch (err) { console.error("Model Load Error"); }
+            } catch (err) { console.error("FaceAPI Load Fail"); }
         }
 
         async function initCamera() {
@@ -142,8 +164,13 @@
                 });
                 video.srcObject = currentStream;
                 video.classList.toggle('mirror', useFrontCamera);
+                
+                const track = currentStream.getVideoTracks()[0];
+                const caps = track.getCapabilities ? track.getCapabilities() : {};
+                document.getElementById('zoom-area').style.display = caps.zoom ? 'flex' : 'none';
+                
                 video.onloadedmetadata = detectFaces;
-            } catch (err) { alert("Izin kamera diperlukan!"); }
+            } catch (err) { alert("Akses Kamera Ditolak!"); }
         }
 
         function toggleCamera() { useFrontCamera = !useFrontCamera; initCamera(); }
@@ -158,7 +185,7 @@
                 const ctx = canvas.getContext('2d');
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 faceapi.draw.drawDetections(canvas, faceapi.resizeResults(detections, displaySize));
-            }, 500);
+            }, 600);
         }
 
         function initGPS() {
@@ -169,6 +196,7 @@
                     document.getElementById('gps-accuracy').innerText = `📡 Sinyal OK (${Math.round(accuracy)}m)`;
                     btnSave.disabled = false;
                     btnSave.innerText = "💾 SIMPAN PDF KE HP";
+                    
                     if (!map) {
                         map = L.map('map', { zoomControl: false, attributionControl: false }).setView([latitude, longitude], 17);
                         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { crossOrigin: true }).addTo(map);
@@ -182,74 +210,77 @@
         }
 
         function syncText(el, id) { 
-            document.getElementById(id).innerText = el.value.toUpperCase() || (id.includes('opd') ? 'BKPSDM' : '0'); 
+            document.getElementById(id).innerText = el.value || (id.includes('opd') ? 'BKPSDM' : '0'); 
         }
 
-        // PERBAIKAN FUNGSI SIMPAN PDF
+        // FUNGSI UTAMA: GENERATE PDF DENGAN DATA LENGKAP
         async function generateFastPDF() {
-            btnSave.innerText = "⚡ MENGUNDUH...";
+            const originalText = btnSave.innerText;
+            btnSave.innerText = "⏳ MEMPROSES PDF...";
             btnSave.disabled = true;
 
             const area = document.getElementById('report-area');
             const snapCanvas = document.getElementById('snapshot-canvas');
-            
-            // 1. Ambil Foto Realtime
+            const opd = document.getElementById('opd-name-top').innerText;
+
+            // Step 1: Ambil Foto Terakhir
             snapCanvas.width = video.videoWidth;
             snapCanvas.height = video.videoHeight;
-            const snapCtx = snapCanvas.getContext('2d');
+            const ctxSnap = snapCanvas.getContext('2d');
             if (useFrontCamera) {
-                snapCtx.translate(snapCanvas.width, 0);
-                snapCtx.scale(-1, 1);
+                ctxSnap.translate(snapCanvas.width, 0);
+                ctxSnap.scale(-1, 1);
             }
-            snapCtx.filter = video.style.filter;
-            snapCtx.drawImage(video, 0, 0);
+            ctxSnap.filter = getComputedStyle(video).filter;
+            ctxSnap.drawImage(video, 0, 0);
             
-            // Sembunyikan video asli agar html2canvas mengambil snapshot saja
-            video.style.visibility = 'hidden';
+            // Siapkan tampilan untuk dipotret html2canvas
+            video.style.display = 'none';
             snapCanvas.style.display = 'block';
-            snapCanvas.style.position = 'absolute';
-            snapCanvas.style.top = '0';
 
             try {
-                // 2. Render Area ke Canvas
+                // Step 2: Render area menjadi gambar
                 const canvas = await html2canvas(area, {
                     useCORS: true,
-                    scale: 1.5, // Dikecilkan sedikit agar HP tidak crash
+                    scale: 2,
                     backgroundColor: "#ffffff",
-                    logging: false
+                    onclone: (clonedDoc) => {
+                        // Pastikan data inputan terbaru ikut terpotret
+                        clonedDoc.getElementById('out-hadir').innerText = document.getElementById('out-hadir').innerText;
+                        clonedDoc.getElementById('out-cuti').innerText = document.getElementById('out-cuti').innerText;
+                        clonedDoc.getElementById('out-izin').innerText = document.getElementById('out-izin').innerText;
+                        clonedDoc.getElementById('out-sakit').innerText = document.getElementById('out-sakit').innerText;
+                        clonedDoc.getElementById('out-tugas').innerText = document.getElementById('out-tugas').innerText;
+                        clonedDoc.getElementById('out-belajar').innerText = document.getElementById('out-belajar').innerText;
+                    }
                 });
 
-                // 3. Konversi ke PDF
+                // Step 3: Susun ke dalam PDF
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                const imgData = canvas.toDataURL('image/jpeg', 0.75); // Kompresi 75%
-                
+                const imgData = canvas.toDataURL('image/jpeg', 0.85);
                 const pdfWidth = 210;
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-                
+
                 pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
 
-                // 4. TRICK ANDROID: Gunakan Blob untuk download jika save() gagal
-                const fileName = `LAPORAN_${document.getElementById('opd-name-top').innerText}.pdf`;
-                const blobPDF = pdf.output('blob');
-                const blobUrl = URL.createObjectURL(blobPDF);
-                
-                const link = document.createElement('a');
-                link.href = blobUrl;
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+                // Step 4: Download Otomatis di Android
+                const blob = pdf.output('blob');
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `LAPORAN_KEHADIRAN_${opd}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
 
             } catch (err) {
-                alert("Gagal: Gunakan Browser Chrome!");
+                alert("Gagal menyimpan PDF. Gunakan browser Chrome.");
                 console.error(err);
             } finally {
-                video.style.visibility = 'visible';
+                video.style.display = 'block';
                 snapCanvas.style.display = 'none';
-                btnSave.innerText = "💾 SIMPAN PDF KE HP";
+                btnSave.innerText = originalText;
                 btnSave.disabled = false;
             }
         }
