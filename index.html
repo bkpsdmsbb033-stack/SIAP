@@ -15,56 +15,66 @@
         :root { --primary: #2c3e50; --success: #27ae60; --bg: #f4f7f9; }
         body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; }
 
-        /* Area yang akan dijadikan PDF */
-        #report-area { width: 100%; max-width: 480px; background: white; display: flex; flex-direction: column; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        /* AREA LAPORAN (UKURAN DIOPTIMALKAN UNTUK LAYAR HP) */
+        #report-area { 
+            width: 100%; 
+            max-width: 480px; 
+            background: white; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
 
-        .header-kop { display: flex; align-items: center; padding: 18px; background: white; border-bottom: 3px solid #000; gap: 15px; }
-        .logo-kab { width: 45px; height: 55px; object-fit: contain; }
-        .opd-info b { font-size: 15px; color: #111; display: block; text-transform: uppercase; line-height: 1.2; }
-        .opd-info span { font-size: 11px; color: #444; font-weight: bold; }
+        .header-kop { display: flex; align-items: center; padding: 12px 18px; background: white; border-bottom: 3px solid #000; gap: 15px; }
+        .logo-kab { width: 40px; height: 50px; object-fit: contain; }
+        .opd-info b { font-size: 14px; color: #111; display: block; text-transform: uppercase; line-height: 1.2; }
+        .opd-info span { font-size: 10px; color: #444; font-weight: bold; }
 
-        #photo-container { position: relative; width: 100%; background: #000; line-height: 0; overflow: hidden; min-height: 300px; }
-        video { width: 100%; display: block; transition: filter 0.2s; }
+        /* Tinggi Video Dikurangi agar Footer Naik */
+        #photo-container { position: relative; width: 100%; background: #000; line-height: 0; overflow: hidden; height: 260px; }
+        video { width: 100%; height: 100%; object-fit: cover; transition: filter 0.2s; }
         .mirror { transform: scaleX(-1); }
         
         canvas#overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; }
         #snapshot-canvas { display: none; width: 100%; }
 
         .cam-controls {
-            position: absolute; bottom: 15px; left: 10px; right: 10px; z-index: 10;
-            display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.4);
-            padding: 10px; border-radius: 8px;
+            position: absolute; bottom: 10px; left: 10px; right: 10px; z-index: 10;
+            display: flex; flex-direction: column; gap: 5px; background: rgba(0,0,0,0.4);
+            padding: 8px; border-radius: 8px;
         }
 
-        .cam-row { display: flex; align-items: center; gap: 10px; color: white; font-size: 12px; }
+        .cam-row { display: flex; align-items: center; gap: 10px; color: white; font-size: 11px; }
         .cam-row input { flex: 1; accent-color: var(--success); }
 
         #switch-btn {
             position: absolute; top: 10px; right: 10px; z-index: 10;
             background: var(--success); color: white; border: none;
-            padding: 8px 12px; border-radius: 5px; cursor: pointer;
-            font-size: 11px; font-weight: bold;
+            padding: 6px 10px; border-radius: 5px; cursor: pointer;
+            font-size: 10px; font-weight: bold;
         }
 
-        .data-footer { padding: 18px; background: white; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; border-top: 1px solid #eee; }
-        .footer-section h4 { margin: 0 0 8px 0; font-size: 13px; color: var(--success); border-bottom: 1px solid #eee; padding-bottom: 4px; }
-        .info-text { font-size: 10px; color: #333; line-height: 1.4; }
-        #map { width: 100%; height: 100px; margin-top: 8px; border: 1px solid #ddd; border-radius: 4px; }
-        .rekap-grid { display: grid; grid-template-columns: 1fr auto; gap: 4px; font-size: 11px; }
+        /* Padding Footer Diperkecil agar masuk frame */
+        .data-footer { padding: 12px 15px; background: white; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 10px; border-top: 1px solid #eee; }
+        .footer-section h4 { margin: 0 0 5px 0; font-size: 12px; color: var(--success); border-bottom: 1px solid #eee; padding-bottom: 2px; }
+        .info-text { font-size: 9.5px; color: #333; line-height: 1.3; }
+        #map { width: 100%; height: 80px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; }
+        .rekap-grid { display: grid; grid-template-columns: 1fr auto; gap: 2px; font-size: 10px; }
 
-        /* Area Input (Tidak masuk PDF) */
-        .controls { width: 92%; max-width: 480px; margin: 20px 0; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); box-sizing: border-box; }
-        .grid-input { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-        input[type="text"], input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
-        .btn-main { background: var(--success); color: white; border: none; padding: 18px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .btn-main:disabled { background: #ccc; cursor: not-allowed; }
+        /* PANEL KONTROL */
+        .controls { width: 92%; max-width: 480px; margin: 15px 0; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); box-sizing: border-box; }
+        .grid-input { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 13px; }
+        .btn-main { background: var(--success); color: white; border: none; padding: 15px; width: 100%; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 15px; }
+        .btn-main:disabled { background: #ccc; }
     </style>
 </head>
 <body onload="startApp()">
 
     <div id="report-area">
         <div class="header-kop">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/bc/Lambang_Kabupaten_Seram_Bagian_Barat.png" class="logo-kab">
+            <img src="img/Kab-sbb.png" class="logo-kab">
             <div class="opd-info">
                 <b id="opd-name-top">BKPSDM</b>
                 <span>PEMERINTAH KABUPATEN SERAM BAGIAN BARAT</span>
@@ -72,7 +82,7 @@
         </div>
 
         <div id="photo-container">
-            <button id="switch-btn" onclick="toggleCamera()">🔄 GANTI KAMERA</button>
+            <button id="switch-btn" onclick="toggleCamera()">🔄 GANTI</button>
             <div class="cam-controls">
                 <div class="cam-row">☀️ <input type="range" id="bright-range" min="50" max="150" value="100" oninput="applyFilters()"></div>
                 <div id="zoom-area" class="cam-row" style="display: none;">🔍 <input type="range" id="zoom-range" min="1" max="3" step="0.1" value="1" oninput="applyZoom()"></div>
@@ -84,41 +94,40 @@
 
         <div class="data-footer">
             <div class="footer-section">
-                <h4>INFORMASI LOKASI</h4>
+                <h4>LOKASI & WAKTU</h4>
                 <div class="info-text">
-                    📅 <b id="wm-date">-</b><br>
-                    ⏰ <b id="wm-time">-</b><br>
-                    📍 <b id="location-text">Mencari GPS...</b><br>
-                    <span style="color:var(--success); font-weight:bold" id="gps-accuracy">📡 Mengunci Sinyal...</span>
+                    📅 <span id="wm-date">-</span><br>
+                    ⏰ <span id="wm-time">-</span><br>
+                    📍 <span id="location-text">GPS...</span><br>
+                    <small id="gps-accuracy" style="color:var(--success)">Sinyal...</small>
                 </div>
                 <div id="map"></div>
             </div>
             
             <div class="footer-section">
-                <h4>REKAP KEHADIRAN</h4>
+                <h4>REKAP DATA</h4>
                 <div class="rekap-grid">
-                    <span>Hadir (AI):</span> <b id="out-hadir">0</b>
+                    <span>Hadir:</span> <b id="out-hadir">0</b>
                     <span>Cuti:</span> <b id="out-cuti">0</b>
                     <span>Izin:</span> <b id="out-izin">0</b>
                     <span>Sakit:</span> <b id="out-sakit">0</b>
                     <span>Tugas:</span> <b id="out-tugas">0</b>
-                    <span>Izin Belajar:</span> <b id="out-belajar">0</b>
+                    <span>Belajar:</span> <b id="out-belajar">0</b>
                 </div>
-                <p style="font-size: 9px; margin-top: 15px; color: #888; font-style: italic;">* Data laporan otomatis tersinkronisasi.</p>
             </div>
         </div>
     </div>
 
     <div class="controls">
-        <input type="text" id="input-opd" placeholder="Ketik Nama OPD..." oninput="syncText(this, 'opd-name-top')" style="margin-bottom:12px;">
+        <input type="text" id="input-opd" placeholder="Nama OPD..." oninput="syncText(this, 'opd-name-top')" style="margin-bottom:10px;">
         <div class="grid-input">
-            <input type="number" id="in-cuti" placeholder="Jumlah Cuti" oninput="syncText(this, 'out-cuti')">
-            <input type="number" id="in-izin" placeholder="Jumlah Izin" oninput="syncText(this, 'out-izin')">
-            <input type="number" id="in-sakit" placeholder="Jumlah Sakit" oninput="syncText(this, 'out-sakit')">
-            <input type="number" id="in-tugas" placeholder="Jumlah Tugas" oninput="syncText(this, 'out-tugas')">
-            <input type="number" id="in-belajar" placeholder="Izin Belajar" oninput="syncText(this, 'out-belajar')" style="grid-column: span 2;">
+            <input type="number" placeholder="Cuti" oninput="syncText(this, 'out-cuti')">
+            <input type="number" placeholder="Izin" oninput="syncText(this, 'out-izin')">
+            <input type="number" placeholder="Sakit" oninput="syncText(this, 'out-sakit')">
+            <input type="number" placeholder="Tugas" oninput="syncText(this, 'out-tugas')">
+            <input type="number" placeholder="Izin Belajar" oninput="syncText(this, 'out-belajar')" style="grid-column: span 2;">
         </div>
-        <button class="btn-main" id="btn-save" onclick="generateFastPDF()" disabled>⌛ MENGUNCI LOKASI...</button>
+        <button class="btn-main" id="btn-save" onclick="generateFastPDF()" disabled>⌛ MENGUNCI GPS...</button>
     </div>
 
     <script>
@@ -151,9 +160,9 @@
                 setInterval(() => {
                     const n = new Date();
                     document.getElementById('wm-time').innerText = n.toLocaleTimeString('id-ID');
-                    document.getElementById('wm-date').innerText = n.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                    document.getElementById('wm-date').innerText = n.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
                 }, 1000);
-            } catch (err) { console.error("FaceAPI Load Fail"); }
+            } catch (err) { console.error("FaceAPI Fail"); }
         }
 
         async function initCamera() {
@@ -170,7 +179,7 @@
                 document.getElementById('zoom-area').style.display = caps.zoom ? 'flex' : 'none';
                 
                 video.onloadedmetadata = detectFaces;
-            } catch (err) { alert("Akses Kamera Ditolak!"); }
+            } catch (err) { alert("Kamera Error!"); }
         }
 
         function toggleCamera() { useFrontCamera = !useFrontCamera; initCamera(); }
@@ -192,10 +201,10 @@
             if (navigator.geolocation) {
                 navigator.geolocation.watchPosition(pos => {
                     const { latitude, longitude, accuracy } = pos.coords;
-                    document.getElementById('location-text').innerText = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-                    document.getElementById('gps-accuracy').innerText = `📡 Sinyal OK (${Math.round(accuracy)}m)`;
+                    document.getElementById('location-text').innerText = `${latitude.toFixed(5)},${longitude.toFixed(5)}`;
+                    document.getElementById('gps-accuracy').innerText = `Akurasi: ${Math.round(accuracy)}m`;
                     btnSave.disabled = false;
-                    btnSave.innerText = "💾 SIMPAN PDF KE HP";
+                    btnSave.innerText = "💾 SIMPAN PDF";
                     
                     if (!map) {
                         map = L.map('map', { zoomControl: false, attributionControl: false }).setView([latitude, longitude], 17);
@@ -213,17 +222,14 @@
             document.getElementById(id).innerText = el.value || (id.includes('opd') ? 'BKPSDM' : '0'); 
         }
 
-        // FUNGSI UTAMA: GENERATE PDF DENGAN DATA LENGKAP
         async function generateFastPDF() {
-            const originalText = btnSave.innerText;
-            btnSave.innerText = "⏳ MEMPROSES PDF...";
+            btnSave.innerText = "⏳ PROSES...";
             btnSave.disabled = true;
 
             const area = document.getElementById('report-area');
             const snapCanvas = document.getElementById('snapshot-canvas');
-            const opd = document.getElementById('opd-name-top').innerText;
 
-            // Step 1: Ambil Foto Terakhir
+            // Ambil Frame Video
             snapCanvas.width = video.videoWidth;
             snapCanvas.height = video.videoHeight;
             const ctxSnap = snapCanvas.getContext('2d');
@@ -234,53 +240,38 @@
             ctxSnap.filter = getComputedStyle(video).filter;
             ctxSnap.drawImage(video, 0, 0);
             
-            // Siapkan tampilan untuk dipotret html2canvas
             video.style.display = 'none';
             snapCanvas.style.display = 'block';
 
             try {
-                // Step 2: Render area menjadi gambar
                 const canvas = await html2canvas(area, {
                     useCORS: true,
                     scale: 2,
                     backgroundColor: "#ffffff",
-                    onclone: (clonedDoc) => {
-                        // Pastikan data inputan terbaru ikut terpotret
-                        clonedDoc.getElementById('out-hadir').innerText = document.getElementById('out-hadir').innerText;
-                        clonedDoc.getElementById('out-cuti').innerText = document.getElementById('out-cuti').innerText;
-                        clonedDoc.getElementById('out-izin').innerText = document.getElementById('out-izin').innerText;
-                        clonedDoc.getElementById('out-sakit').innerText = document.getElementById('out-sakit').innerText;
-                        clonedDoc.getElementById('out-tugas').innerText = document.getElementById('out-tugas').innerText;
-                        clonedDoc.getElementById('out-belajar').innerText = document.getElementById('out-belajar').innerText;
-                    }
+                    scrollY: -window.scrollY // Fix posisi potret
                 });
 
-                // Step 3: Susun ke dalam PDF
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                const imgData = canvas.toDataURL('image/jpeg', 0.85);
+                const imgData = canvas.toDataURL('image/jpeg', 0.9);
                 const pdfWidth = 210;
                 const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
                 pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-
-                // Step 4: Download Otomatis di Android
+                
                 const blob = pdf.output('blob');
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `LAPORAN_KEHADIRAN_${opd}.pdf`;
-                document.body.appendChild(a);
+                a.download = `LAPORAN_SBB_${Date.now()}.pdf`;
                 a.click();
-                document.body.removeChild(a);
 
             } catch (err) {
-                alert("Gagal menyimpan PDF. Gunakan browser Chrome.");
-                console.error(err);
+                alert("Gagal menyimpan PDF!");
             } finally {
                 video.style.display = 'block';
                 snapCanvas.style.display = 'none';
-                btnSave.innerText = originalText;
+                btnSave.innerText = "💾 SIMPAN PDF";
                 btnSave.disabled = false;
             }
         }
