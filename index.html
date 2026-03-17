@@ -79,7 +79,7 @@
 
     <div id="report-area">
         <div class="header-kop">
-            <img src="img/Kab-sbb.png" class="logo-kab">
+            <img src="img/Kab-sbb.png" class="logo-kab" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/b/bc/Lambang_Kabupaten_Seram_Bagian_Barat.png'">
             <div class="opd-info">
                 <b id="opd-name-top">BKPSDM</b>
                 <span>PEMERINTAH KABUPATEN SERAM BAGIAN BARAT</span>
@@ -160,10 +160,8 @@
             const zoomVal = document.getElementById('zoom-range').value;
             
             try {
-                // Hanya bekerja pada browser yang mendukung ImageCapture API (Chrome/Android)
                 await track.applyConstraints({ advanced: [{ zoom: zoomVal }] });
             } catch (e) {
-                // Fallback: CSS Zoom jika hardware zoom tidak didukung
                 video.style.transform = (useFrontCamera ? "scaleX(-1) " : "") + `scale(${zoomVal})`;
             }
         }
@@ -179,12 +177,11 @@
                     document.getElementById('wm-time').innerText = n.toLocaleTimeString('id-ID');
                     document.getElementById('wm-date').innerText = n.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
                 }, 1000);
-            } catch (err) { alert("Error: " + err.message); }
+            } catch (err) { console.error(err); }
         }
 
         async function initCamera() {
             if (currentStream) currentStream.getTracks().forEach(t => t.stop());
-
             const constraints = {
                 video: { facingMode: useFrontCamera ? "user" : "environment", width: 640, height: 480 }
             };
@@ -193,14 +190,13 @@
                 currentStream = await navigator.mediaDevices.getUserMedia(constraints);
                 video.srcObject = currentStream;
                 video.classList.toggle('mirror', useFrontCamera);
-
-                // Cek apakah hardware mendukung zoom
+                
                 const track = currentStream.getVideoTracks()[0];
                 const caps = track.getCapabilities ? track.getCapabilities() : {};
                 document.getElementById('zoom-area').style.display = caps.zoom ? 'flex' : 'none';
 
                 video.onloadedmetadata = detectFaces;
-            } catch (err) { alert("Kamera Error."); }
+            } catch (err) { alert("Akses Kamera Ditolak."); }
         }
 
         function toggleCamera() {
@@ -229,9 +225,10 @@
                     const { latitude, longitude, accuracy } = pos.coords;
                     document.getElementById('location-text').innerText = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
                     document.getElementById('gps-accuracy').innerText = `📡 Sinyal OK (${Math.round(accuracy)}m)`;
-                    if (accuracy < 150) {
+                    
+                    if (accuracy < 200) { // Toleransi GPS diperlonggar agar tombol cepat muncul
                         btnSave.disabled = false;
-                        btnSave.innerText = "💾 TERBITKAN LAPORAN PDF";
+                        btnSave.innerText = "💾 SIMPAN PDF KE HP";
                     }
                     if (!map) {
                         map = L.map('map', { zoomControl: false, attributionControl: false }).setView([latitude, longitude], 17);
@@ -249,42 +246,64 @@
             document.getElementById(id).innerText = el.value.toUpperCase() || (id.includes('opd') ? 'BKPSDM' : '0'); 
         }
 
+        // FUNGSI GENERATE PDF UNTUK ANDROID
         async function generateFastPDF() {
-            btnSave.innerText = "⚡ MENCETAK...";
+            const originalText = btnSave.innerText;
+            btnSave.innerText = "⚡ PROSES PDF...";
             btnSave.disabled = true;
 
             const area = document.getElementById('report-area');
             const snapCanvas = document.getElementById('snapshot-canvas');
             const opdName = document.getElementById('input-opd').value || "BKPSDM";
+            const tanggal = new Date().toISOString().slice(0,10);
             
+            // Ambil snapshot frame video saat ini
             snapCanvas.width = video.videoWidth;
             snapCanvas.height = video.videoHeight;
             const ctx = snapCanvas.getContext('2d');
             
-            // Terapkan filter kecerahan ke snapshot
             ctx.filter = `brightness(${document.getElementById('bright-range').value}%)`;
-            
             if (useFrontCamera) {
                 ctx.translate(snapCanvas.width, 0);
                 ctx.scale(-1, 1);
             }
             ctx.drawImage(video, 0, 0);
             
-            video.style.display = 'none';
+            // Sembunyikan video asli sementara untuk proses html2canvas
+            video.style.opacity = '0';
             snapCanvas.style.display = 'block';
+            snapCanvas.style.position = 'absolute';
+            snapCanvas.style.top = '0';
+            snapCanvas.style.zIndex = '1';
 
             try {
-                const canvasResult = await html2canvas(area, { useCORS: true, scale: 2 });
-                const imgData = canvasResult.toDataURL('image/jpeg', 0.9);
+                // Konfigurasi html2canvas untuk mobile agar tajam
+                const canvasResult = await html2canvas(area, { 
+                    useCORS: true, 
+                    scale: 2,
+                    logging: false,
+                    allowTaint: true
+                });
+                
+                const imgData = canvasResult.toDataURL('image/jpeg', 0.8);
                 const { jsPDF } = window.jspdf;
+                
+                // Ukuran A4: 210 x 297 mm
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                pdf.addImage(imgData, 'JPEG', 0, 0, 210, (canvasResult.height * 210) / canvasResult.width);
-                pdf.save(`Laporan_${opdName}.pdf`);
-            } catch (err) { alert("Gagal PDF"); }
-            finally {
-                video.style.display = 'block';
+                const imgWidth = 210;
+                const imgHeight = (canvasResult.height * imgWidth) / canvasResult.width;
+                
+                pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+                
+                // Perintah simpan otomatis ke perangkat
+                pdf.save(`LAPORAN_${opdName}_${tanggal}.pdf`);
+                
+            } catch (err) { 
+                alert("Gagal membuat PDF: " + err.message); 
+            } finally {
+                video.style.opacity = '1';
                 snapCanvas.style.display = 'none';
-                btnSave.innerText = "💾 TERBITKAN LAPORAN PDF";
+                btnSave.innerText = originalText;
                 btnSave.disabled = false;
             }
         }
